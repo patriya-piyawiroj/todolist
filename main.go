@@ -33,8 +33,6 @@ type (
 
 // Const
 const (
-	TestID = "601a45fde33637ef17c32275"
-
 	Todo       StatusType = "TODO"
 	InProgress StatusType = "IN_PROGRESS"
 	Done       StatusType = "DONE"
@@ -68,9 +66,6 @@ func main() {
 // e.GET("/getDetailByID/:id", getDetailById)
 func getDetailByID(c echo.Context) error {
 	id := c.Param("id")
-	if id == "" {
-		id = TestID
-	}
 	log.Println("Getting detail by id", id)
 	return c.JSON(http.StatusOK, getByID(id, collection))
 }
@@ -90,26 +85,20 @@ func createTask(c echo.Context) error {
 		Status:      StatusType(c.QueryParam("status")),
 	}
 	insert(t, collection)
-	return c.String(http.StatusOK, "Successful")
+	return c.String(http.StatusOK, "Create Task Successful")
 }
 
 // e.DELETE("/deleteTask/:id", deleteTask)
 func deleteTask(c echo.Context) error {
 	id := c.Param("id")
-	if id == "" {
-		id = TestID
-	}
 	log.Println("Deleting detail by id", id)
 	delete(id, collection)
-	return c.String(http.StatusOK, "Successful")
+	return c.String(http.StatusOK, "Delete Task Successful")
 }
 
 // e.PUT("/updateTask/:id", updateTask)
 func updateTask(c echo.Context) error {
 	id := c.Param("id")
-	if id == "" {
-		id = TestID
-	}
 	log.Println("Updating task", id)
 	t := Task{
 		Name:        c.QueryParam("name"),

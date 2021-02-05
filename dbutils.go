@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,14 +10,14 @@ import (
 )
 
 // Get tasks by ID
-func getByID(id string, c *mongo.Collection) Task {
-	var res Task
+func getByID(id string, c *mongo.Collection) bson.M {
+	var res bson.M
 	bsonID, err := primitive.ObjectIDFromHex(id)
 	err = collection.FindOne(context.TODO(), bson.M{"_id": bsonID}).Decode(&res)
 	if err != nil {
 		log.Fatal("Error", err)
 	}
-	fmt.Printf("Found a single document: %+v\n", res)
+	log.Println("Found a single document:", res)
 	return res
 }
 
@@ -41,7 +40,7 @@ func insert(t Task, c *mongo.Collection) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("inserted document with ID %v\n", res.InsertedID)
+	log.Println("inserted document with ID", res.InsertedID)
 }
 
 // Delete a task
@@ -51,7 +50,7 @@ func delete(id string, c *mongo.Collection) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("deleted %v documents\n", res.DeletedCount)
+	log.Println("deleted document count", res.DeletedCount)
 }
 
 // Updpate a task
