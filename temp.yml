@@ -16,9 +16,9 @@ services:
       - todolist-app
     volumes:
       - mongo-data:/data/db
-networks:
-  todolist-app:
-    driver: bridge
-volumes:
-  mongo-data:
-    driver: local
+  networks:
+    todolist-app:
+      driver: bridge
+  volumes:
+    mongo-data:
+      driver: local

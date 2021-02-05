@@ -52,13 +52,14 @@ func main() {
 	e.DELETE("/deleteTask/:id", deleteTask)
 
 	// Open server connection
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://mongo:27017"))
 	if err != nil {
 		log.Fatal(err)
-		fmt.Println("Error:", err)
+		fmt.Println("Error connecting to db:27017", err)
 		os.Exit(1)
 	}
 	collection = client.Database("todolist").Collection("tasks")
+	log.Println("Connected to mongo", client)
 
 	// Start service
 	e.Logger.Fatal(e.Start(":1234"))
