@@ -13,7 +13,7 @@ import (
 func getByID(id string, c *mongo.Collection) bson.M {
 	var res bson.M
 	bsonID, err := primitive.ObjectIDFromHex(id)
-	err = collection.FindOne(context.TODO(), bson.M{"_id": bsonID}).Decode(&res)
+	err = c.FindOne(context.TODO(), bson.M{"_id": bsonID}).Decode(&res)
 	if err != nil {
 		log.Fatal("Error", err)
 	}
