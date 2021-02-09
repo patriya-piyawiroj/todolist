@@ -1,43 +1,47 @@
 package main
 
 import (
-	"log"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
 type Handler struct {
-	srv *Service
+	srv       *Service
+	validator *Validator
 }
 
-func NewHandler(srv *Service) *Handler {
+func NewHandler(srv *Service, validator *Validator) *Handler {
 	return &Handler{
-		srv: srv,
+		srv:       srv,
+		validator: validator,
 	}
 }
 
 // e.POST("/v1/tasks", createTaskHandler)
-func (h Handler) createTaskHandler(c echo.Context) (err error) {
-	log.Println("Creating task")
+func (h Handler) createTaskHandler(c echo.Context) error {
+
+	// Placeholders
 	req := new(TaskRequest)
 	rsp := new(TaskResponse)
-	if err = c.Bind(req); err != nil { //Validate here
-		return err
+
+	// Validate request
+	if err := h.validator.validateCreateTaskRequest(c, req); err != nil {
+		return c.JSON(http.StatusBadRequest, err) // TODO: Fix error here
 	}
-	// service.CreateTask(req, rsp)
-	log.Println(req, rsp, h.srv)
-	h.srv.CreateTask(req, rsp)
-	return nil
+
+	// Perform request logic
+	if err := h.srv.CreateTask(req, rsp); err != nil {
+		return c.JSON(http.StatusBadRequest, err) // TODO: Fix error here
+	}
+
+	// Return response
+	return c.JSON(http.StatusOK, rsp)
 }
 
-// TaskRequest
-type TaskRequest struct {
-	Name        string `json:"name" form:"name" query:"name"`
-	Description string `json:"desc" form:"desc" query:"desc"`
-	Status      string `json:"status" form:"status" query:"status"`
-}
 type TaskResponse struct {
-	sample string
+	Location  string `json:"location"`
+	CreatedAt string `json:"dateCreated"`
 }
 
 // // e.GET("/getDetailByID/:id", getDetailById)

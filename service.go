@@ -1,6 +1,9 @@
 package main
 
-import "log"
+import (
+	"log"
+	"time"
+)
 
 type Service struct {
 	repo Repository
@@ -12,13 +15,17 @@ func NewService(repo Repository) *Service {
 	}
 }
 
-func (s Service) CreateTask(request *TaskRequest, response *TaskResponse) error {
-	log.Println("Startins ervice")
+func (s Service) CreateTask(req *TaskRequest, rsp *TaskResponse) error {
+	log.Println("Starting service")
 	t := Task{
-		Name:        "namem",
-		Description: "asfd",
-		Status:      "TODO",
+		Name:        req.Name,
+		Description: req.Description,
+		Status:      StatusType(req.Status),
+		CreatedAt:   time.Now(),
 	}
-	s.repo.Insert(t)
-	return nil
+	err := s.repo.Insert(t)
+	// if err != nil {
+	// 	return NewError("Could not create new task", 500, err, RepoLayerError)
+	// }
+	return err
 }
