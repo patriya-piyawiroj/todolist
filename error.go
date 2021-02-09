@@ -1,27 +1,31 @@
 package main
 
-import "errors"
+import "fmt"
 
 var (
-	ErrIDNotFound = errors.New("ID no found")
+	ErrContentType      = "Incorrect content type"
+	ErrRepositoryInsert = "Could not insert task"
+
+	ErrValidationInstance = "/todolist/validator"
+	ErrServiceInstance    = "/todolist/service"
 )
 
 type Error struct {
-	title    string `json:"title"`
-	status   int    `json:"status"`
-	detail   string `json:"detail"`
-	instance string `json:"instance"`
+	Title    string `json:"title"`
+	Status   int    `json:"status"`
+	Detail   string `json:"detail"`
+	Instance string `json:"instance"`
 }
 
 func NewError(title string, status int, detail string, instance string) *Error {
 	return &Error{
-		title:    title,
-		status:   status,
-		detail:   detail,
-		instance: instance,
+		Title:    title,
+		Status:   status,
+		Detail:   detail,
+		Instance: instance,
 	}
 }
 
-// func (r *Error) Error() string {
-// 	return fmt.Sprintf("status %d: err %v", r.status, r.title)
-// }
+func (r *Error) Error() string {
+	return fmt.Sprintf("Error %d %v: %v at %v", r.Status, r.Title, r.Detail, r.Instance)
+}

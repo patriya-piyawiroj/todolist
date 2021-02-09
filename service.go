@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"time"
 )
 
@@ -23,9 +24,13 @@ func (s Service) CreateTask(req *TaskRequest, rsp *TaskResponse) error {
 		Status:      StatusType(req.Status),
 		CreatedAt:   time.Now(),
 	}
-	err := s.repo.Insert(t)
-	// if err != nil {
-	// 	return NewError("Could not create new task", 500, err, RepoLayerError)
-	// }
-	return err
+	if err := s.repo.Insert(&t); err != nil {
+		return NewError(ErrRepositoryInsert,
+			http.StatusInternalServerError,
+			err.Error(),
+			ErrServiceInstance)
+	}
+	rsp.CreatedAt = t.CreatedAt
+	rsp.Location = t.OID.String()
+	return nil
 }

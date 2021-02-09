@@ -6,7 +6,3 @@ type TaskRequest struct {
 	Description string `json:"desc" form:"desc" query:"desc"`
 	Status      string `json:"status" form:"status" query:"status"`
 }
-
-// func (cv *CustomValidator) Validate(i interface{}) error {
-// 	return cv.validator.Struct(i)
-// }

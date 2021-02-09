@@ -1,8 +1,6 @@
 package main
 
 import (
-	"errors"
-	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -20,19 +18,26 @@ func (v Validator) validateCreateTaskRequest(c echo.Context, req *TaskRequest) e
 	// Validate header
 	contentType := c.Request().Header.Get("Content-Type")
 	if contentType != "application/json" {
-		errString := "incorrect content type: Expected application/json but received " + contentType
-		return c.JSON(http.StatusBadRequest, errString)
+		return NewError(ErrContentType,
+			http.StatusBadRequest,
+			"Expected application/json",
+			ErrValidationInstance)
 	}
 
 	// Bind request
 	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return NewError(ErrContentType,
+			http.StatusBadRequest,
+			"Could not bind to request",
+			ErrValidationInstance)
 	}
 
 	// Validate fields
 	if _, exist := StatusTypes[req.Status]; !exist {
-		log.Println("Invalid status")
-		return errors.New("Not a valid status")
+		return NewError(ErrContentType,
+			http.StatusBadRequest,
+			"Not a valid status type",
+			ErrValidationInstance)
 	}
 
 	return nil

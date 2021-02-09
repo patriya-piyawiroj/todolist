@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -27,12 +28,12 @@ func (h Handler) createTaskHandler(c echo.Context) error {
 
 	// Validate request
 	if err := h.validator.validateCreateTaskRequest(c, req); err != nil {
-		return c.JSON(http.StatusBadRequest, err) // TODO: Fix error here
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	// Perform request logic
 	if err := h.srv.CreateTask(req, rsp); err != nil {
-		return c.JSON(http.StatusBadRequest, err) // TODO: Fix error here
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
 	// Return response
@@ -40,8 +41,8 @@ func (h Handler) createTaskHandler(c echo.Context) error {
 }
 
 type TaskResponse struct {
-	Location  string `json:"location"`
-	CreatedAt string `json:"dateCreated"`
+	Location  string    `json:"location"`
+	CreatedAt time.Time `json:"dateCreated"`
 }
 
 // // e.GET("/getDetailByID/:id", getDetailById)

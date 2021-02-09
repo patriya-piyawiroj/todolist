@@ -5,6 +5,7 @@ import (
 	"log"
 	"sync"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -54,16 +55,22 @@ func (m MongoDB) DBConnection() (*mongo.Collection, error) {
 }
 
 // Insert in to DB TODO : Return associated location on create
-func (m MongoDB) Insert(t Task) (err error) {
+func (m MongoDB) Insert(t *Task) error {
 	log.Println("Attempting insert")
+	var err error
 	m.collection, err = m.DBConnection()
 	if err != nil {
 		return err
 	}
 	res, err := m.collection.InsertOne(context.TODO(), t)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	log.Println("inserted document with ID", res.InsertedID)
+	newID := res.InsertedID
+	if oid, ok := res.InsertedID.(primitive.ObjectID); ok {
+		t.OID = oid
+	}
+
+	log.Println("inserted document with ID", newID)
 	return nil
 }
