@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -40,11 +39,6 @@ func (h Handler) createTaskHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, rsp)
 }
 
-type TaskResponse struct {
-	Location  string    `json:"location"`
-	CreatedAt time.Time `json:"dateCreated"`
-}
-
 // // e.GET("/getDetailByID/:id", getDetailById)
 // func getDetailByID(c echo.Context) error {
 // 	id := c.Param("id")
@@ -78,32 +72,4 @@ type TaskResponse struct {
 // 	}
 // 	update(id, t, collection)
 // 	return c.String(http.StatusOK, "Successful")
-// }
-
-// Handler
-// func(c echo.Context) error {
-// 	name := c.FormValue("name")
-// 	return c.String(http.StatusOK, name)
-// }
-
-// type Timestamp time.Time
-
-// func (t *Timestamp) UnmarshalParam(src string) error {
-// 	ts, err := time.Parse(time.RFC3339, src)
-// 	*t = Timestamp(ts)
-// 	return err
-// }
-
-// type TaskRequest struct {}
-
-// func (cb *CustomBinder) Bind(i interface{}, c echo.Context) (err error) {
-// 	// You may use default binder
-// 	db := new(echo.DefaultBinder)
-// 	if err = db.Bind(i, c); err != echo.ErrUnsupportedMediaType {
-// 		return
-// 	}
-
-// 	// Define your custom implementation
-
-// 	return
 // }
