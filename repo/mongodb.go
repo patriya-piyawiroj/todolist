@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	connectionString = "mongodb://localhost:27017"
+	connectionString = "mongodb://mongodb:27017"
+	localString      = "mongodb://localhost:27017"
 	dbString         = "todolist"
 	tasks            = "tasks"
 )
@@ -39,7 +40,7 @@ func (m MongoDB) DBConnection() (*mongo.Collection, error) {
 	// Open server connection
 	log.Println("Attempting conn")
 	m.mongoOnce.Do(func() {
-		client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(connectionString))
+		client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(localString))
 		if err != nil {
 			log.Fatal(err)
 			m.clientInstanceError = err

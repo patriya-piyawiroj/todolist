@@ -22,8 +22,8 @@ func NewHandler(srv *Service, validator *Validator) *Handler {
 func (h Handler) CreateTaskHandler(c echo.Context) error {
 
 	// Placeholders
-	req := new(TaskRequest)
-	rsp := new(TaskResponse)
+	req := new(CreateTaskRequest)
+	rsp := new(CreateTaskResponse)
 
 	// Validate request
 	if err := h.validator.ValidateCreateTaskRequest(c, req); err != nil {

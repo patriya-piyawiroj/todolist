@@ -12,7 +12,7 @@ import (
 func TestValidateCreateTaskRequest(t *testing.T) {
 	e := echo.New()
 	v := service.NewValidator()
-	emptyReq := new(service.TaskRequest)
+	emptyReq := new(service.CreateTaskRequest)
 
 	malformedReq := `"name": "name", "desc": "desc", "status": "Todo"}`
 	invalidTypeReq := `{"name": "name", "desc": "desc", "status": "INVALID"}`

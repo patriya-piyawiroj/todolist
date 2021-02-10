@@ -2,7 +2,7 @@ package service
 
 import "time"
 
-type TaskResponse struct {
+type CreateTaskResponse struct {
 	Location  string    `json:"location"`
 	CreatedAt time.Time `json:"dateCreated"`
 }

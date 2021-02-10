@@ -14,9 +14,11 @@ func NewValidator() *Validator {
 	return &Validator{}
 }
 
-func (v Validator) ValidateCreateTaskRequest(c echo.Context, req *TaskRequest) error {
+// ValidateCreateTaskRequest
+func (v Validator) ValidateCreateTaskRequest(c echo.Context, req *CreateTaskRequest) error {
 
 	// Validate header
+	// 4. X Header like http request id, request datetime
 	contentType := c.Request().Header.Get("Content-Type")
 	if contentType != "application/json" {
 		return NewError(ErrContentType,

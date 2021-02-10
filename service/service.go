@@ -1,7 +1,6 @@
 package service
 
 import (
-	"log"
 	"net/http"
 	"time"
 
@@ -19,8 +18,7 @@ func NewService(repo repo.Repository) *Service {
 	}
 }
 
-func (s Service) CreateTask(req *TaskRequest, rsp *TaskResponse) error {
-	log.Println("Starting service")
+func (s Service) CreateTask(req *CreateTaskRequest, rsp *CreateTaskResponse) error {
 	t := models.Task{
 		Name:        req.Name,
 		Description: req.Description,
