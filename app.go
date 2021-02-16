@@ -13,8 +13,8 @@ type App struct {
 	echo *echo.Echo
 }
 
-func (a *App) Initialize() {
-	a.db = repo.NewMongoDB(context.Background())
+func (a *App) Initialize(addr string, db string, collection string) {
+	a.db = repo.NewRepo(context.Background(), addr, db, collection)
 	a.echo = echo.New()
 
 	// Init

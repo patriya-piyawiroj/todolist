@@ -11,14 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const (
-	connectionString = "mongodb://mongodb:27017"
-	localString      = "mongodb://localhost:27017"
-	dbString         = "todolist"
-	tasks            = "tasks"
-)
-
 type MongoDB struct {
+	addrString       string
+	dbString         string
+	collectionString string
 	// Pointer to Collection
 	collection *mongo.Collection
 	// Used to create singleton object of client exposed through GetMongoClient()
@@ -29,8 +25,12 @@ type MongoDB struct {
 	mongoOnce sync.Once
 }
 
-func NewMongoDB(ctx context.Context) *MongoDB {
-	m := MongoDB{}
+func NewRepo(ctx context.Context, addr string, db string, collection string) *MongoDB {
+	m := MongoDB{
+		addrString:       addr,
+		dbString:         db,
+		collectionString: collection,
+	}
 	m.DBConnection(ctx)
 	return &m
 }
@@ -40,7 +40,7 @@ func (m *MongoDB) DBConnection(ctx context.Context) (*mongo.Collection, error) {
 	// Open server connection
 	log.Println("Attempting conn")
 	m.mongoOnce.Do(func() {
-		client, err := mongo.Connect(ctx, options.Client().ApplyURI(localString))
+		client, err := mongo.Connect(ctx, options.Client().ApplyURI(m.addrString))
 		if err != nil {
 			log.Fatal(err)
 			m.clientInstanceError = err
@@ -50,7 +50,7 @@ func (m *MongoDB) DBConnection(ctx context.Context) (*mongo.Collection, error) {
 		if err != nil {
 			m.clientInstanceError = err
 		}
-		m.collection = client.Database(dbString).Collection(tasks)
+		m.collection = client.Database(m.dbString).Collection(m.collectionString)
 		log.Println("Connected to mongo client")
 	})
 	return m.collection, m.clientInstanceError
