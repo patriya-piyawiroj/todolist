@@ -2,13 +2,16 @@ package repo
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"reflect"
 	"sync"
 	"todolist/models"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type MongoDB struct {
@@ -32,6 +35,21 @@ func NewRepo(ctx context.Context, addr string, db string, collection string) *Mo
 		collectionString: collection,
 	}
 	m.DBConnection(ctx)
+
+	// Sample index creation
+	mod := mongo.IndexModel{
+		Keys: bson.M{
+			"CreatedAt": 1, // index in ascending order
+		}, Options: nil,
+	}
+	ind, err := m.collection.Indexes().CreateOne(ctx, mod)
+	if err != nil {
+		fmt.Println("Indexes().CreateOne() ERROR:", err)
+	} else {
+		fmt.Println("CreateOne() index:", ind)
+		fmt.Println("CreateOne() type:", reflect.TypeOf(ind), "\n")
+	}
+
 	return &m
 }
 
