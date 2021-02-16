@@ -39,3 +39,17 @@ func (s *TaskService) CreateTask(ctx context.Context, req *CreateTaskRequest) (*
 	rsp.Location = t.OID.String()
 	return rsp, nil
 }
+
+// GetTaskByID
+func (s *TaskService) GetTaskByID(ctx context.Context, req *GetTaskRequest) (*GetTaskResponse, error) {
+	task, err := s.repo.GetByID(ctx, req.OID)
+	if err != nil {
+		return nil, NewError(ErrRepositoryInsert,
+			http.StatusInternalServerError,
+			err.Error(),
+			ErrServiceInstance)
+	}
+	rsp := new(GetTaskResponse)
+	rsp.Task = task
+	return rsp, nil
+}

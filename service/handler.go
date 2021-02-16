@@ -18,7 +18,7 @@ func NewHandler(srv *TaskService, validator *Validator) *Handler {
 	}
 }
 
-// e.POST("/v1/tasks", createTaskHandler)
+// e.POST("/v1/tasks", CreateTaskHandler)
 func (h *Handler) CreateTaskHandler(c echo.Context) error {
 
 	// Placeholders
@@ -40,12 +40,24 @@ func (h *Handler) CreateTaskHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, rsp)
 }
 
-// // e.GET("/tasks/:id", getDetailById)
-// func getDetailByID(c echo.Context) error {
-// 	id := c.Param("id")
-// 	log.Println("Getting detail by id", id)
-// 	return c.JSON(http.StatusOK, getByID(id, collection))
-// }
+// e.GET("v1/tasks/:id", GetTaskHandler)
+func (h *Handler) GetTaskHandler(c echo.Context) error {
+	// Validate request
+	req := new(GetTaskRequest)
+	req.idString = c.Param("id")
+	if err := h.validator.ValidateGetTaskRequest(c, req); err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	// Perform request logic
+	rsp, err := h.srv.GetTaskByID(c.Request().Context(), req)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	// Return response
+	return c.JSON(http.StatusOK, rsp)
+}
 
 // // e.GET("/tasks", getTodoList)
 // func getTodoList(c echo.Context) error {

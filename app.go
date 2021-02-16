@@ -24,6 +24,7 @@ func (a *App) Initialize(addr string, db string, collection string) {
 
 	// Define all methods
 	a.echo.POST("/v1/tasks", handler.CreateTaskHandler)
+	a.echo.GET("/v1/tasks/:id", handler.GetTaskHandler)
 }
 
 func (a *App) Run(addr string) {

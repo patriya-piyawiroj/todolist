@@ -76,7 +76,6 @@ func (m *MongoDB) DBConnection(ctx context.Context) (*mongo.Collection, error) {
 
 // Insert in to DB
 func (m *MongoDB) Insert(ctx context.Context, t *models.Task) error {
-	log.Println("Attempting insert")
 	var err error
 	m.collection, err = m.DBConnection(ctx)
 	if err != nil {
@@ -90,7 +89,17 @@ func (m *MongoDB) Insert(ctx context.Context, t *models.Task) error {
 	if oid, ok := res.InsertedID.(primitive.ObjectID); ok {
 		t.OID = oid
 	}
-
-	log.Println("inserted document with ID", newID)
+	log.Println("Inserted document with ID", newID)
 	return nil
+}
+
+// Get tasks by ID
+func (m *MongoDB) GetByID(ctx context.Context, id primitive.ObjectID) (models.Task, error) {
+	var res models.Task
+	err := m.collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&res)
+	if err != nil {
+		return res, err
+	}
+	log.Println("Found document:", res)
+	return res, nil
 }

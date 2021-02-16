@@ -9,6 +9,23 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func TestValidateGetTaskRequest(t *testing.T) {
+	e := echo.New()
+	v := service.NewValidator()
+	emptyReq := new(service.GetTaskRequest)
+	rec := httptest.NewRecorder()
+
+	// Test with invalid status type field
+	stringReader := strings.NewReader("")
+	req := httptest.NewRequest(echo.GET, "http://localhost:1234/v1/tasks/602b48c4d8d855b476be2b27", stringReader)
+	req.Header.Set("Content-Type", "application/json")
+	c := e.NewContext(req, rec)
+	err := v.ValidateGetTaskRequest(c, emptyReq)
+	if !strings.Contains(err.Error(), "Not a valid status type") {
+		t.Errorf("Should have resulted in invalid status type error")
+	}
+}
+
 func TestValidateCreateTaskRequest(t *testing.T) {
 	e := echo.New()
 	v := service.NewValidator()

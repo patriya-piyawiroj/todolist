@@ -10,7 +10,7 @@ type (
 
 	// Task in TodoList
 	Task struct {
-		OID         primitive.ObjectID `json:"id" bson:"omitempty"`
+		OID         primitive.ObjectID `json:"id" bson:"_id, omitempty"`
 		Name        string             `json:"name" bson:"name"`
 		Description string             `json:"description" bson:"description"`
 		Status      string             `json:"status" bson:"status"`
