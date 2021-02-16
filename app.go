@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"todolist/repo"
 	"todolist/service"
 
@@ -13,12 +14,12 @@ type App struct {
 }
 
 func (a *App) Initialize() {
-	a.db = repo.NewMongoDB()
+	a.db = repo.NewMongoDB(context.Background())
 	a.echo = echo.New()
 
 	// Init
 	validator := service.NewValidator()
-	srv := service.NewService(a.db)
+	srv := service.NewTaskService(a.db)
 	handler := service.NewHandler(srv, validator)
 
 	// Define all methods

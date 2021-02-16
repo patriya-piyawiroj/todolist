@@ -20,7 +20,7 @@ func TestValidateCreateTaskRequest(t *testing.T) {
 	stringReader := strings.NewReader(malformedReq)
 	req := httptest.NewRequest(echo.POST, "http://localhost:1234/v1/tasks", stringReader)
 	req.Header.Set("X-Request-ID", "val")
-	req.Header.Set("X-Request-Header", "val")
+	req.Header.Set("X-Request-DateTime", "Date: Wed, 16 Oct 2019 07:28:00 GMT ")
 	req.Header.Set("Content-Type", "multipart/form-data")
 
 	// Test with invalid Content-Type Header

@@ -7,11 +7,11 @@ import (
 )
 
 type Handler struct {
-	srv       *Service
+	srv       *TaskService
 	validator *Validator
 }
 
-func NewHandler(srv *Service, validator *Validator) *Handler {
+func NewHandler(srv *TaskService, validator *Validator) *Handler {
 	return &Handler{
 		srv:       srv,
 		validator: validator,
@@ -19,11 +19,11 @@ func NewHandler(srv *Service, validator *Validator) *Handler {
 }
 
 // e.POST("/v1/tasks", createTaskHandler)
-func (h Handler) CreateTaskHandler(c echo.Context) error {
+func (h *Handler) CreateTaskHandler(c echo.Context) error {
 
 	// Placeholders
 	req := new(CreateTaskRequest)
-	rsp := new(CreateTaskResponse)
+	// rsp := new(CreateTaskResponse)
 
 	// Validate request
 	if err := h.validator.ValidateCreateTaskRequest(c, req); err != nil {
@@ -31,7 +31,8 @@ func (h Handler) CreateTaskHandler(c echo.Context) error {
 	}
 
 	// Perform request logic
-	if err := h.srv.CreateTask(req, rsp); err != nil {
+	rsp, err := h.srv.CreateTask(c.Request().Context(), req)
+	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 
@@ -39,20 +40,20 @@ func (h Handler) CreateTaskHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, rsp)
 }
 
-// // e.GET("/getDetailByID/:id", getDetailById)
+// // e.GET("/tasks/:id", getDetailById)
 // func getDetailByID(c echo.Context) error {
 // 	id := c.Param("id")
 // 	log.Println("Getting detail by id", id)
 // 	return c.JSON(http.StatusOK, getByID(id, collection))
 // }
 
-// // e.GET("/getTodoList", getTodoList)
+// // e.GET("/tasks", getTodoList)
 // func getTodoList(c echo.Context) error {
 // 	log.Println("Getting all tasks")
 // 	return c.JSON(http.StatusOK, getAll(collection))
 // }
 
-// // e.DELETE("/deleteTask/:id", deleteTask)
+// // e.DELETE("/tasks/:id", deleteTask)
 // func deleteTask(c echo.Context) error {
 // 	id := c.Param("id")
 // 	log.Println("Deleting detail by id", id)
@@ -61,7 +62,7 @@ func (h Handler) CreateTaskHandler(c echo.Context) error {
 // 	//echo.NewHTTPError(http.StatusInternalServerError)
 // }
 
-// // e.PUT("/updateTask/:id", updateTask)
+// // e.PUT("/tasks/:id", updateTask)
 // func updateTask(c echo.Context) error {
 // 	id := c.Param("id")
 // 	log.Println("Updating task", id)

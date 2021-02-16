@@ -29,24 +29,24 @@ type MongoDB struct {
 	mongoOnce sync.Once
 }
 
-func NewMongoDB() *MongoDB {
+func NewMongoDB(ctx context.Context) *MongoDB {
 	m := MongoDB{}
-	m.DBConnection()
+	m.DBConnection(ctx)
 	return &m
 }
 
 // DBConnection Get Connection to DB
-func (m MongoDB) DBConnection() (*mongo.Collection, error) {
+func (m *MongoDB) DBConnection(ctx context.Context) (*mongo.Collection, error) {
 	// Open server connection
 	log.Println("Attempting conn")
 	m.mongoOnce.Do(func() {
-		client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(localString))
+		client, err := mongo.Connect(ctx, options.Client().ApplyURI(localString))
 		if err != nil {
 			log.Fatal(err)
 			m.clientInstanceError = err
 		}
 		// Check the connection
-		err = client.Ping(context.TODO(), nil)
+		err = client.Ping(ctx, nil)
 		if err != nil {
 			m.clientInstanceError = err
 		}
@@ -56,15 +56,15 @@ func (m MongoDB) DBConnection() (*mongo.Collection, error) {
 	return m.collection, m.clientInstanceError
 }
 
-// Insert in to DB TODO : Return associated location on create
-func (m MongoDB) Insert(t *models.Task) error {
+// Insert in to DB
+func (m *MongoDB) Insert(ctx context.Context, t *models.Task) error {
 	log.Println("Attempting insert")
 	var err error
-	m.collection, err = m.DBConnection()
+	m.collection, err = m.DBConnection(ctx)
 	if err != nil {
 		return err
 	}
-	res, err := m.collection.InsertOne(context.TODO(), t)
+	res, err := m.collection.InsertOne(ctx, t)
 	if err != nil {
 		return err
 	}

@@ -1,8 +1,11 @@
 package repo
 
-import "todolist/models"
+import (
+	"context"
+	"todolist/models"
+)
 
 // Repository Interface for db
 type Repository interface {
-	Insert(task *models.Task) error
+	Insert(ctx context.Context, task *models.Task) error
 }
