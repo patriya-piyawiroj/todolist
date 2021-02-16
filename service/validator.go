@@ -62,16 +62,8 @@ func (v Validator) ValidateGetTaskRequest(c echo.Context, req *GetTaskRequest) e
 		return err
 	}
 
-	// Bind request
-	if err := c.Bind(req); err != nil {
-		return NewError(ErrContentType,
-			http.StatusBadRequest,
-			"Could not bind to request",
-			ErrValidationInstance)
-	}
-
 	// Check for valid OID number
-	if oid, err := primitive.ObjectIDFromHex(req.idString); err != nil {
+	if oid, err := primitive.ObjectIDFromHex(req.IdString); err != nil {
 		return NewError(ErrContentType,
 			http.StatusBadRequest,
 			"Invalid OID",

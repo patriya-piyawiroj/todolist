@@ -14,5 +14,5 @@ type CreateTaskRequest struct {
 // GetTaskRequest
 type GetTaskRequest struct {
 	OID      primitive.ObjectID `json:"oid" form:"oid" query:"oid"`
-	idString string             `json:"id" form:"id" query:"id"`
+	IdString string             `json:"id" form:"id" query:"id"`
 }

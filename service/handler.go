@@ -44,7 +44,7 @@ func (h *Handler) CreateTaskHandler(c echo.Context) error {
 func (h *Handler) GetTaskHandler(c echo.Context) error {
 	// Validate request
 	req := new(GetTaskRequest)
-	req.idString = c.Param("id")
+	req.IdString = c.Param("id")
 	if err := h.validator.ValidateGetTaskRequest(c, req); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
