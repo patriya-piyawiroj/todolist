@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"todolist/app"
+	"todolist/configs"
 
 	"gopkg.in/yaml.v3"
 )
@@ -10,26 +12,27 @@ import (
 // Main function
 func main() {
 
-	f, err := os.Open("config.yml")
+	// ===================== init configs =============================
+	f, err := os.Open("configs/config.yml")
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer f.Close()
 
-	var cfg Config
+	var conf configs.Configs
 	decoder := yaml.NewDecoder(f)
-	err = decoder.Decode(&cfg)
+	err = decoder.Decode(&conf)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	repo := cfg.Database
+	repo := conf.Database
 
 	// readFile(&cfg)
 	// readEnv(&cfg)
-	fmt.Printf("%+v", cfg)
+	fmt.Printf("%+v", conf)
 
-	a := App{}
-	a.Initialize(repo.Address, repo.DB, repo.Collection)
-	a.Run(cfg.Server.Port)
+	a := app.App{}
+	a.Initialize(repo.Address, repo.DB, repo.Collection, &conf)
+	a.Run(conf.Server.Port)
 }

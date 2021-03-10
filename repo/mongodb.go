@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"sync"
 	"todolist/models"
@@ -46,20 +45,6 @@ func NewRepo(ctx context.Context, addr string, db string, collection string) *Mo
 	}
 	m.DBConnection(ctx)
 
-	// Sample index creation
-	mod := mongo.IndexModel{
-		Keys: bson.M{
-			"CreatedAt": 1, // index in ascending order
-		}, Options: nil,
-	}
-	mod.Options.SetBackground(true) // must run in background
-	ind, err := m.collection.Indexes().CreateOne(ctx, mod)
-	if err != nil {
-		fmt.Println("Indexes().CreateOne() ERROR:", err)
-	} else {
-		fmt.Println("CreateOne() index:", ind)
-	}
-
 	return &m
 }
 
@@ -81,6 +66,21 @@ func (m *MongoDB) DBConnection(ctx context.Context) (*mongo.Collection, error) {
 	m.collection = client.Database(m.dbString).Collection(m.collectionString)
 	log.Println("Connected to mongo client")
 	// })
+
+	// Sample index creation
+	// mod := mongo.IndexModel{
+	// 	Keys: bson.M{
+	// 		"CreatedAt": 1, // index in ascending order
+	// 	}, Options: nil,
+	// }
+	// mod.Options.SetBackground(true) // must run in background
+	// ind, err := m.collection.Indexes().CreateOne(ctx, mod)
+	// if err != nil {
+	// 	fmt.Println("Indexes().CreateOne() ERROR:", err)
+	// } else {
+	// 	fmt.Println("CreateOne() index:", ind)
+	// }
+
 	return m.collection, m.clientInstanceError
 }
 

@@ -1,9 +1,0 @@
-server:
-  project_addr: "http://localhost:1234"
-  service_name: "todolist"
-  port: ":1234"
-mongodb:
-  address: "mongodb://localhost:27017"
-  local: "mongodb://mongodb:27017"
-  db : "todolist"
-  collection : "tasks"
