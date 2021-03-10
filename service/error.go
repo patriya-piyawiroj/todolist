@@ -3,8 +3,8 @@ package service
 import "fmt"
 
 var (
-	ErrContentType      = "Incorrect content type"
-	ErrRepositoryInsert = "Could not insert task"
+	ErrContentType = "Incorrect content type"
+	ErrRepository  = "Database error"
 
 	ErrValidationInstance = "/todolist/validator"
 	ErrServiceInstance    = "/todolist/service"

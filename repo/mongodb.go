@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"reflect"
 	"sync"
 	"todolist/models"
 
@@ -14,6 +13,16 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// Repository Interface for db
+type Repository interface {
+	Insert(ctx context.Context, task *models.Task) error
+	GetByID(ctx context.Context, id primitive.ObjectID) (models.Task, error)
+	GetAll(ctx context.Context) ([]models.Task, error)
+	Delete(ctx context.Context, id primitive.ObjectID) (string, error)
+	Update(ctx context.Context, id primitive.ObjectID, t *models.Task) (models.Task, error)
+}
+
+// MongoDB struct
 type MongoDB struct {
 	addrString       string
 	dbString         string
@@ -28,6 +37,7 @@ type MongoDB struct {
 	mongoOnce sync.Once
 }
 
+// NewRepo instantiates new MongoDB
 func NewRepo(ctx context.Context, addr string, db string, collection string) *MongoDB {
 	m := MongoDB{
 		addrString:       addr,
@@ -42,45 +52,40 @@ func NewRepo(ctx context.Context, addr string, db string, collection string) *Mo
 			"CreatedAt": 1, // index in ascending order
 		}, Options: nil,
 	}
+	mod.Options.SetBackground(true) // must run in background
 	ind, err := m.collection.Indexes().CreateOne(ctx, mod)
 	if err != nil {
 		fmt.Println("Indexes().CreateOne() ERROR:", err)
 	} else {
 		fmt.Println("CreateOne() index:", ind)
-		fmt.Println("CreateOne() type:", reflect.TypeOf(ind), "\n")
 	}
 
 	return &m
 }
 
 // DBConnection Get Connection to DB
-func (m *MongoDB) DBConnection(ctx context.Context) (*mongo.Collection, error) {
+func (m *MongoDB) DBConnection(ctx context.Context) (*mongo.Collection, error) { // mongo options, connection pools
 	// Open server connection
-	log.Println("Attempting conn")
-	m.mongoOnce.Do(func() {
-		client, err := mongo.Connect(ctx, options.Client().ApplyURI(m.addrString))
-		if err != nil {
-			log.Fatal(err)
-			m.clientInstanceError = err
-		}
-		// Check the connection
-		err = client.Ping(ctx, nil)
-		if err != nil {
-			m.clientInstanceError = err
-		}
-		m.collection = client.Database(m.dbString).Collection(m.collectionString)
-		log.Println("Connected to mongo client")
-	})
+	log.Println("Attempting to connect to ", m.addrString)
+	// m.mongoOnce.Do(func() {
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(m.addrString))
+	if err != nil {
+		log.Fatal(err)
+		m.clientInstanceError = err
+	}
+	// Check the connection
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		m.clientInstanceError = err
+	}
+	m.collection = client.Database(m.dbString).Collection(m.collectionString)
+	log.Println("Connected to mongo client")
+	// })
 	return m.collection, m.clientInstanceError
 }
 
 // Insert in to DB
 func (m *MongoDB) Insert(ctx context.Context, t *models.Task) error {
-	var err error
-	m.collection, err = m.DBConnection(ctx)
-	if err != nil {
-		return err
-	}
 	res, err := m.collection.InsertOne(ctx, t)
 	if err != nil {
 		return err
@@ -93,13 +98,45 @@ func (m *MongoDB) Insert(ctx context.Context, t *models.Task) error {
 	return nil
 }
 
-// Get tasks by ID
+// GetByID returns tasks and error if not found
 func (m *MongoDB) GetByID(ctx context.Context, id primitive.ObjectID) (models.Task, error) {
 	var res models.Task
-	err := m.collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&res)
+	err := m.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&res)
+	log.Println("Found document:", res)
+	return res, err
+}
+
+// GetAll returns all tasks in collection
+func (m *MongoDB) GetAll(ctx context.Context) ([]models.Task, error) {
+	var res []models.Task
+	// empty case, no documents
+	cursor, err := m.collection.Find(ctx, bson.M{})
 	if err != nil {
 		return res, err
 	}
-	log.Println("Found document:", res)
+	err = cursor.All(ctx, &res)
 	return res, nil
+}
+
+// Delete object with OID, returns id of deleted object and error if not found
+func (m *MongoDB) Delete(ctx context.Context, id primitive.ObjectID) (string, error) {
+	// Handle document not found
+	_, err := m.collection.DeleteOne(ctx, bson.M{"_id": id})
+	log.Println("deleted document with id", id.String())
+	return id.String(), err
+}
+
+// Update object at OID, returns document found and error if not found
+func (m *MongoDB) Update(ctx context.Context, id primitive.ObjectID, t *models.Task) (models.Task, error) {
+	// timestamp updateAt, createAt
+	update := bson.M{
+		"$set": bson.M{
+			"name":        t.Name,
+			"description": t.Description,
+			"status":      t.Status,
+		},
+	}
+	var res models.Task
+	err := m.collection.FindOneAndUpdate(ctx, bson.M{"_id": id}, update).Decode(&res)
+	return res, err
 }

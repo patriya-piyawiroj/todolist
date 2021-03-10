@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"todolist/handler"
 	"todolist/repo"
 	"todolist/service"
 
@@ -20,11 +21,14 @@ func (a *App) Initialize(addr string, db string, collection string) {
 	// Init
 	validator := service.NewValidator()
 	srv := service.NewTaskService(a.db)
-	handler := service.NewHandler(srv, validator)
+	handler := handler.NewHandler(srv, validator)
 
 	// Define all methods
 	a.echo.POST("/v1/tasks", handler.CreateTaskHandler)
 	a.echo.GET("/v1/tasks/:id", handler.GetTaskHandler)
+	a.echo.GET("/v1/tasks", handler.GetAllHandler)
+	a.echo.DELETE("/v1/tasks/:id", handler.DeleteTaskHandler)
+	a.echo.PUT("/v1/tasks/:id", handler.UpdateTaskHandler)
 }
 
 func (a *App) Run(addr string) {
