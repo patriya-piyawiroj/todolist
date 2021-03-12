@@ -1,11 +1,16 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"todolist/app"
 	"todolist/configs"
+	"todolist/handler"
+	"todolist/repo"
+	"todolist/service"
 
+	"github.com/labstack/echo/v4"
 	"gopkg.in/yaml.v3"
 )
 
@@ -26,13 +31,22 @@ func main() {
 		fmt.Println(err)
 	}
 
-	repo := conf.Database
+	// ===================== init redis =============================
+	app.InitRedis(&conf)
 
-	// readFile(&cfg)
-	// readEnv(&cfg)
-	fmt.Printf("%+v", conf)
+	// ===================== init db =============================
+	db := repo.NewRepo(context.Background(), conf.Database.Address, conf.Database.DB, conf.Database.Collection)
+	validator := service.NewValidator()
+	srv := service.NewTaskService(db, conf)
+	handler := handler.NewHandler(srv, validator)
 
-	a := app.App{}
-	a.Initialize(repo.Address, repo.DB, repo.Collection, &conf)
-	a.Run(conf.Server.Port)
+	//  ===================== define routes =============================
+	e := echo.New()
+	e.POST("/v1/tasks", handler.CreateTaskHandler)
+	e.GET("/v1/tasks/:id", handler.GetTaskHandler)
+	e.GET("/v1/tasks", handler.GetAllHandler)
+	e.DELETE("/v1/tasks/:id", handler.DeleteTaskHandler)
+	e.PUT("/v1/tasks/:id", handler.UpdateTaskHandler)
+
+	e.Logger.Fatal(e.Start(conf.Server.Port))
 }
